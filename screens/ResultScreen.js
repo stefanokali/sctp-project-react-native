@@ -1,140 +1,66 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
-import { DataTable } from "react-native-paper";
+
 import FilterContext from "../context/FilterContext";
+import { apiHDBGet } from "../helperApi";
+import ResultTable from "../component/ResultTable";
 
 const ResultScreen = () => {
-  const context = useContext(FilterContext);
-  const addresses = context.resultsAddressChosen;
 
-  const [goToPage, setGoToPage] = useState(1);
+    let initialLoad = true;
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 20;
-  const lastIndex = currentPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const records = addresses.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(addresses.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
+    const [loading, setLoading] = useState(false);
+  
+    const rowLimit = 10000;
+    const totalRow = 0;
+    const context = useContext(FilterContext);
+  
+    useEffect(() => {
+      if (initialLoad) {
+        setLoading(true);
+        apiHDBGet({
+          rowLimit: rowLimit,
+          totalRow: totalRow,
+          context: context,
+          setLoading: setLoading,
+        });
+        initialLoad = false;
+      }
+    }, [context.selected]);
 
-  console.log("records", records);
-
-  const prevPage = (e) => {
-    e.preventDefault();
-    if (currentPage > 1) {
-      setCurrentPage((prevPage) => parseInt(prevPage) - 1);
-    }
-  };
-
-  const nextPage = (e) => {
-    e.preventDefault();
-    if (currentPage < npage) {
-      setCurrentPage((prevPage) => parseInt(prevPage) + 1);
-    }
-  };
-
-  const handleGoToPage = (e) => {
-    if (e.target.value == "") {
-      setGoToPage(e.target.value);
-    }
-    if (e.target.value >= 1 && e.target.value <= npage) {
-      setGoToPage(e.target.value);
-      setCurrentPage(e.target.value);
-    }
-  };
-
-  const [page, setPage] = useState(0);
-  const [numberOfItemsPerPageList] = useState([2, 3, 4]);
-  const [itemsPerPage, onItemsPerPageChange] = useState(
-    numberOfItemsPerPageList[0]
-  );
-
-  const [items] = React.useState([
-   {
-     key: 1,
-     name: 'Cupcake',
-     calories: 356,
-     fat: 16,
-   },
-   {
-     key: 2,
-     name: 'Eclair',
-     calories: 262,
-     fat: 16,
-   },
-   {
-     key: 3,
-     name: 'Frozen yogurt',
-     calories: 159,
-     fat: 6,
-   },
-   {
-     key: 4,
-     name: 'Gingerbread',
-     calories: 305,
-     fat: 3.7,
-   },
-  ]);
-
-  const from = page * itemsPerPage;
-  const to = Math.min((page + 1) * itemsPerPage, items.length);
-
-  React.useEffect(() => {
-    setPage(0);
-  }, [itemsPerPage]);
 
   return (
     <>
-    <DataTable>
-      <DataTable.Header>
-        <DataTable.Title>Dessert</DataTable.Title>
-        <DataTable.Title numeric>Calories</DataTable.Title>
-        <DataTable.Title numeric>Fat</DataTable.Title>
-      </DataTable.Header>
-
-      {items.slice(from, to).map((item) => (
-        <DataTable.Row key={item.key}>
-          <DataTable.Cell>{item.name}</DataTable.Cell>
-          <DataTable.Cell numeric>{item.calories}</DataTable.Cell>
-          <DataTable.Cell numeric>{item.fat}</DataTable.Cell>
-        </DataTable.Row>
-      ))}
-
-      <DataTable.Pagination
-        page={page}
-        numberOfPages={Math.ceil(items.length / itemsPerPage)}
-        onPageChange={(page) => setPage(page)}
-        label={`${from + 1}-${to} of ${items.length}`}
-        numberOfItemsPerPageList={numberOfItemsPerPageList}
-        numberOfItemsPerPage={itemsPerPage}
-        onItemsPerPageChange={onItemsPerPageChange}
-        showFastPaginationControls
-        selectPageDropdownLabel={'Rows per page'}
-      />
-    </DataTable>
-      {/* <Button title="Prev" class="prev" onClick={(e) => prevPage(e)}></Button>
-      <View>
-        <Text>
-          Curent page: {currentPage}/{npage}
-        </Text>
-        <Text>
-          Go to page:
-          <TextInput value={goToPage} onChange={(e) => handleGoToPage(e)} />
-        </Text>
-      </View>
-      <Button title="Next" class="next" onClick={(e) => nextPage(e)}></Button> */}
+      {loading ? (
+        // <ClipLoader color="#36d7b7" />
+        <Text>Loading...</Text>
+      ) : (
+        <>
+          <Text>Results of average sales by Area</Text>
+          <View className="table-container">
+            <View>
+              <ResultTable className="flex-child" />
+            </View>
+            {/* <Map className="flex-child" /> */}
+          </View>
+        </>
+      )}
     </>
-  );
+  )
+
 };
 
 export default ResultScreen;
 
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 15,
-  },
-  tableHeader: {
-    backgroundColor: "#DCDCDC",
-  },
-});
+    container: {
+      flex: 1,
+      padding: 15,
+    },
+    tableHeader: {
+      backgroundColor: "#DCDCDC",
+    },
+  });
+
+
