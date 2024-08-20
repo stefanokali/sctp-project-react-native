@@ -21,7 +21,7 @@ export const apiHDBGet = async ({
     //   resale_price,
     // } = context.filters[context.filters.length - 1];
 
-    const town = "ANG MO KIO"
+    const town = "BISHAN"
     const flat_type = "All"
     const storey_range = "All"
     const flat_model = "All"
@@ -210,7 +210,7 @@ export const apiHDBGet = async ({
       }
     );
 
-    console.log("listOfHdbWithCoords=", listOfHdbWithCoord[0])
+    console.log("listOfHdbWithCoord", listOfHdbWithCoord[0])
 
     context.setResults(listOfHdbWithCoord);
 
