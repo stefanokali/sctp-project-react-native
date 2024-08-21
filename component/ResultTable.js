@@ -19,7 +19,7 @@ const ResultTable = () => {
 
   const [page, setPage] = useState(0);
 
-  const recordsPerPage = 10;
+  const recordsPerPage = 5;
   const firstIndex = page * recordsPerPage;
   const lastIndex = Math.min((page + 1) * recordsPerPage, addresses.length);
   const records = addresses.slice(firstIndex, lastIndex);
@@ -32,8 +32,6 @@ const ResultTable = () => {
   const handlerShowPrevTransactions = (address) => {
     const { block, street_name } = address;
     context.setIsSelected(true);
-    //navigate(`../trend/${block}/${street_name}`);
-    //window.open(`../trend/${block}/${street_name}`);
     navigation.navigate("PrevTransaction", {
       block,
       street_name,

@@ -4,30 +4,29 @@ import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import FilterContext from "../context/FilterContext";
 import { apiHDBGet } from "../helperApi";
 import ResultTable from "../component/ResultTable";
+import Map from "../component/Map";
 
 const ResultScreen = () => {
+  let initialLoad = true;
 
-    let initialLoad = true;
+  const [loading, setLoading] = useState(false);
 
-    const [loading, setLoading] = useState(false);
-  
-    const rowLimit = 10000;
-    const totalRow = 0;
-    const context = useContext(FilterContext);
-  
-    useEffect(() => {
-      if (initialLoad) {
-        setLoading(true);
-        apiHDBGet({
-          rowLimit: rowLimit,
-          totalRow: totalRow,
-          context: context,
-          setLoading: setLoading,
-        });
-        initialLoad = false;
-      }
-    }, [context.selected]);
+  const rowLimit = 10000;
+  const totalRow = 0;
+  const context = useContext(FilterContext);
 
+  useEffect(() => {
+    if (initialLoad) {
+      setLoading(true);
+      apiHDBGet({
+        rowLimit: rowLimit,
+        totalRow: totalRow,
+        context: context,
+        setLoading: setLoading,
+      });
+      initialLoad = false;
+    }
+  }, [context.selected]);
 
   return (
     <>
@@ -38,29 +37,24 @@ const ResultScreen = () => {
         <>
           <Text>Results of average sales by Area</Text>
           <View className="table-container">
-            <View>
-              <ResultTable className="flex-child" />
-            </View>
+            <ResultTable className="flex-child" />
             {/* <Map className="flex-child" /> */}
           </View>
+          <Map />
         </>
       )}
     </>
-  )
-
+  );
 };
 
 export default ResultScreen;
 
-
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 15,
-    },
-    tableHeader: {
-      backgroundColor: "#DCDCDC",
-    },
-  });
-
-
+  container: {
+    flex: 1,
+    padding: 15,
+  },
+  tableHeader: {
+    backgroundColor: "#DCDCDC",
+  },
+});

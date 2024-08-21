@@ -13,7 +13,7 @@ const PrevTransactionTable = () => {
 
   const [page, setPage] = useState(0);
 
-  const recordsPerPage = 10;
+  const recordsPerPage = 12;
   const firstIndex = page * recordsPerPage;
   const lastIndex = Math.min((page + 1) * recordsPerPage, addresses.length);
   const records = addresses.slice(firstIndex, lastIndex);

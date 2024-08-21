@@ -22,7 +22,9 @@ export default function App() {
               component={PrevTransactionScreen}
               options={{
                 drawerItemStyle: { display: "none" },
+                unmountOnBlur: true
               }}
+              
             />
           </Drawer.Navigator>
         </NavigationContainer>
