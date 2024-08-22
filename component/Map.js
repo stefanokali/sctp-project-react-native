@@ -19,6 +19,7 @@ export default function Map() {
           latitudeDelta: 0.3,
           longitudeDelta: 0.3,
         }}
+        showsUserLocation = {true}
       >
         {addresses.map((address, i) => (
           //   <Marker
@@ -29,8 +30,9 @@ export default function Map() {
           //   />
           <Marker
             coordinate={{ latitude: address.lat, longitude: address.lon }}
+            key={i}
           >
-            <CustomMapMarker key={i} avg_price={address.avg_price} />
+            <CustomMapMarker avg_price={address.avg_price} />
             <Callout>
               <CustomMapCallout address={address} />
             </Callout>

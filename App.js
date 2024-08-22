@@ -7,6 +7,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 import ResultScreen from "./screens/ResultScreen";
 import { FilterProvider } from "./context/FilterContext";
 import PrevTransactionScreen from "./screens/PrevTransactionScreen";
+import FilterScreen from "./screens/FilterScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -16,6 +17,7 @@ export default function App() {
       <FilterProvider>
         <NavigationContainer>
           <Drawer.Navigator>
+            <Drawer.Screen name="Filter" component={FilterScreen} />
             <Drawer.Screen name="Result" component={ResultScreen} />
             <Drawer.Screen
               name="PrevTransaction"
