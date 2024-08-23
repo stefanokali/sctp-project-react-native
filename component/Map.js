@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import MapView, { Callout, Marker } from "react-native-maps";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
+import * as Location from 'expo-location';
 import FilterContext from "../context/FilterContext";
 import CustomMapMarker from "./CustomMapMarker";
 import CustomMapCallout from "./CustomMapCallout";
@@ -8,29 +9,48 @@ import CustomMapCallout from "./CustomMapCallout";
 export default function Map() {
   const context = useContext(FilterContext);
   const addresses = context.results;
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        Alert.alert(
+          "Permission required",
+          "This app needs location permission to show your location on the map.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      let userLocation = await Location.getCurrentPositionAsync({});
+      setLocation(userLocation.coords);
+    })();
+  }, []);
 
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: 1.368791033335324,
-          longitude: 103.80777095700411,
+          latitude: location ? location.latitude : 1.368791033335324,
+          longitude: location ? location.longitude : 103.80777095700411,
           latitudeDelta: 0.3,
           longitudeDelta: 0.3,
         }}
+        showsUserLocation={true}
       >
-        {addresses.map((address, i) => (
-          //   <Marker
-          //     key={i}
-          //     coordinate={{latitude: address.lat, longitude: address.lon}}
-          //     title={`SGD ${address.avg_price.toString()}`}
-          //     description={address.address}
-          //   />
+        {location && (
           <Marker
-            coordinate={{ latitude: address.lat, longitude: address.lon }}
-          >
-            <CustomMapMarker key={i} avg_price={address.avg_price} />
+            coordinate={{ latitude: location.latitude, longitude: location.longitude }}
+            title="My Location"
+          />
+        )}
+        {addresses.map((address, i) => (
+          <Marker key={i} coordinate={{ latitude: address.lat, longitude: address.lon }}>
+            <CustomMapMarker avg_price={address.avg_price} />
             <Callout>
               <CustomMapCallout address={address} />
             </Callout>
