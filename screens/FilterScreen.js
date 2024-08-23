@@ -187,9 +187,9 @@ const FilterScreen = () => {
             />
           </View>
           <View style={styles.row}>
-            <Text>Town:</Text>
+            <Text style={styles.label}>Town: </Text>
             <Text> </Text>
-            <Text>Flat type:</Text>
+            <Text style={styles.label}>Flat type:</Text>
           </View>
 
           <View style={styles.row}>
@@ -215,9 +215,9 @@ const FilterScreen = () => {
             </Picker>
           </View>
           <View style={styles.row}>
-            <Text>Story range:</Text>
+            <Text style={styles.label}>Story range:</Text>
             <Text> </Text>
-            <Text>Flat model:</Text>
+            <Text style={styles.label}>Flat model:</Text>
           </View>
 
           <View style={styles.row}>
@@ -288,5 +288,8 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: "50%",
+  },
+  label: {
+    marginHorizontal: 50,
   },
 });
