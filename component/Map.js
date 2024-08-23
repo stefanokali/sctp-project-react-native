@@ -42,12 +42,12 @@ export default function Map() {
         }}
         showsUserLocation={true}
       >
-        {location && (
+        {/* {location && (
           <Marker
             coordinate={{ latitude: location.latitude, longitude: location.longitude }}
             title="My Location"
           />
-        )}
+        )} */}
         {addresses.map((address, i) => (
           <Marker key={i} coordinate={{ latitude: address.lat, longitude: address.lon }}>
             <CustomMapMarker avg_price={address.avg_price} />
