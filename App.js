@@ -8,7 +8,8 @@ import ResultScreen from "./screens/ResultScreen";
 import { FilterProvider } from "./context/FilterContext";
 import PrevTransactionScreen from "./screens/PrevTransactionScreen";
 
-const Drawer = createDrawerNavigator();
+const Drawer = createDrawerNavigator();  
+
 
 export default function App() {
   return (
