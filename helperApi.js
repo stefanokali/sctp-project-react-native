@@ -21,14 +21,25 @@ export const apiHDBGet = async ({
     //   resale_price,
     // } = context.filters[context.filters.length - 1];
 
-    const town = "BISHAN"
-    const flat_type = "All"
-    const storey_range = "All"
-    const flat_model = "All"
-    const floor_area_sqm = "All"
-    const lease_commence_date = "All"
-    const month = "All"
-    const resale_price = "All"
+    const {
+      resaleDateStart,
+      resaleDateEnd,
+      leaseDateStart,
+      leaseDateEnd,
+      town,
+      flatType,
+      storyRange,
+      flatModel,
+      minFloorArea,
+      maxFloorArea,
+      minPrice,
+      maxPrice,
+    } = context.filters[context.filters.length - 1];
+
+    //const town = "BISHAN"
+    const flat_type = flatType;
+    const storey_range = storyRange;
+    const flat_model = flatModel;
 
     //Build filter based on API requirements
     let filter =
@@ -99,18 +110,16 @@ export const apiHDBGet = async ({
       });
     });
 
-    /*
-
     //Additional filter that cant use API, front end filter
     //Transaction month filter
-    let transactionTimeStart = month[0];
-    if (transactionTimeStart == null) {
-      transactionTimeStart = new Date(0, 0);
-    }
-    let transactionTimeEnd = month[1];
-    if (transactionTimeEnd == null) {
-      transactionTimeEnd = new Date();
-    } // return current date
+    // let transactionTimeStart = month[0];
+    // if (transactionTimeStart == null) {
+    //   transactionTimeStart = new Date(0, 0);
+    // }
+    // let transactionTimeEnd = month[1];
+    // if (transactionTimeEnd == null) {
+    //   transactionTimeEnd = new Date();
+    // } // return current date
 
     listOfHdb = listOfHdb.filter((hdb) => {
       const hdbTransactionTime = new Date(
@@ -118,43 +127,47 @@ export const apiHDBGet = async ({
         hdb.month.split("-")[1]
       );
       return (
-        hdbTransactionTime > transactionTimeStart &&
-        hdbTransactionTime < transactionTimeEnd
+        hdbTransactionTime > resaleDateStart &&
+        hdbTransactionTime < resaleDateEnd
       );
     });
 
     //Lease start filter
-    let leaseStart = lease_commence_date[0];
-    if (leaseStart == null) {
-      leaseStart = new Date(0, 0);
-    }
-    let leaseEnd = lease_commence_date[1];
-    if (leaseEnd == null) {
-      leaseEnd = new Date();
-    } // return current date
+    // let leaseStart = lease_commence_date[0];
+    // if (leaseStart == null) {
+    //   leaseStart = new Date(0, 0);
+    // }
+    // let leaseEnd = lease_commence_date[1];
+    // if (leaseEnd == null) {
+    //   leaseEnd = new Date();
+    // } // return current date
 
     listOfHdb = listOfHdb.filter((hdb) => {
       const hdbLeaseYear = new Date(hdb.lease_commence_date, 0);
-      return hdbLeaseYear > leaseStart && hdbLeaseYear < leaseEnd;
-    });
-
-    //Sqm filter
-    const priceMin = resale_price[0];
-    const priceMax = resale_price[1];
-
-    listOfHdb = listOfHdb.filter((hdb) => {
-      return hdb.resale_price > priceMin && hdb.resale_price < priceMax;
+      return hdbLeaseYear > leaseDateStart && hdbLeaseYear < leaseDateEnd;
     });
 
     //Price filter
-    const floorSqMin = floor_area_sqm[0];
-    const floorSqMax = floor_area_sqm[1];
+    // const priceMin = resale_price[0];
+    // const priceMax = resale_price[1];
 
     listOfHdb = listOfHdb.filter((hdb) => {
-      return hdb.floor_area_sqm > floorSqMin && hdb.floor_area_sqm < floorSqMax;
+      return (
+        hdb.resale_price > parseFloat(minPrice) &&
+        hdb.resale_price < parseFloat(maxPrice)
+      );
     });
 
-    */
+    //Sqm filter
+    // const floorSqMin = floor_area_sqm[0];
+    // const floorSqMax = floor_area_sqm[1];
+
+    listOfHdb = listOfHdb.filter((hdb) => {
+      return (
+        hdb.floor_area_sqm > parseFloat(minFloorArea) &&
+        hdb.floor_area_sqm < parseFloat(maxFloorArea)
+      );
+    });
 
     console.log("listOfHdb after front end filtering", listOfHdb[0]);
 
@@ -210,7 +223,7 @@ export const apiHDBGet = async ({
       }
     );
 
-    console.log("listOfHdbWithCoord", listOfHdbWithCoord[0])
+    console.log("listOfHdbWithCoord", listOfHdbWithCoord[0]);
 
     context.setResults(listOfHdbWithCoord);
 
@@ -282,7 +295,7 @@ export const apiHDBGetSpecificAddress = async ({
     });
 
     context.setResultsAddressChosen(listOfHdb);
-    
+
     setLoading(false);
   } catch (error) {
     console.log(error.message);
@@ -304,28 +317,30 @@ export const apiLocalGetFavourite = async ({
 };
 
 export const apiLocalPostFavourite = async ({ id, block, streetName }) => {
-
   try {
     const response = await apiLocal.post(`/user/${id}/favourite`, {
-      "block": block,
-      "streetName": streetName,
+      block: block,
+      streetName: streetName,
     });
   } catch (error) {
     console.log(error.message);
   }
 };
 
-export const apiLocalDeleteFavourite = async ({ id, setFavourites, setLoading, favId }) => {
-
+export const apiLocalDeleteFavourite = async ({
+  id,
+  setFavourites,
+  setLoading,
+  favId,
+}) => {
   try {
     const responseDelete = await apiLocal.delete(`/user/favourite/${favId}`);
 
     //Update favourites
     const responseGet = await apiLocal.get(`/user/${id}/favourite`);
-    console.log(responseGet)
+    console.log(responseGet);
     setFavourites(responseGet.data);
     setLoading(false);
-
   } catch (error) {
     console.log(error.message);
   }

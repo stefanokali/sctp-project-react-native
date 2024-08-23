@@ -28,6 +28,11 @@ const ResultScreen = () => {
     }
   }, [context.selected]);
 
+  //Check if filter already chosen
+  if (context.filters.count == 0){
+    const isFiltered = False;
+  }
+
   return (
     <>
       {loading ? (
