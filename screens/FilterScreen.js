@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import RNDateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   Button,
   KeyboardAvoidingView,
@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Text,
   View,
+  Platform,
+  TouchableOpacity,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-paper";
@@ -102,13 +104,17 @@ const flatModels = [
 
 const FilterScreen = () => {
   const navigation = useNavigation();
-
   const context = useContext(FilterContext);
 
   const [resaleDateStart, setResaleDateStart] = useState(new Date(1965, 1, 1));
   const [resaleDateEnd, setResaleDateEnd] = useState(new Date());
   const [leaseDateStart, setLeaseDateStart] = useState(new Date(1965, 1, 1));
   const [leaseDateEnd, setLeaseDateEnd] = useState(new Date());
+
+  const [showResaleDateStart, setShowResaleDateStart] = useState(false);
+  const [showResaleDateEnd, setShowResaleDateEnd] = useState(false);
+  const [showLeaseDateStart, setShowLeaseDateStart] = useState(false);
+  const [showLeaseDateEnd, setShowLeaseDateEnd] = useState(false);
 
   const [town, setTown] = useState("All");
   const [flatType, setFlatType] = useState("All");
@@ -121,20 +127,30 @@ const FilterScreen = () => {
   const [minPrice, setMinPrice] = useState("0");
   const [maxPrice, setMaxPrice] = useState("2000000");
 
-  handleSubmit = () => {
+  const onDateChange = (event, selectedDate, setDate, setShow) => {
+    const currentDate = selectedDate || date;
+    setShow(Platform.OS === 'ios');
+    setDate(currentDate);
+  };
+
+  const showDatepicker = (setShow) => {
+    setShow(true);
+  };
+
+  const handleSubmit = () => {
     const newFilter = {
-      resaleDateStart: resaleDateStart,
-      resaleDateEnd: resaleDateEnd,
-      leaseDateStart: leaseDateStart,
-      leaseDateEnd: leaseDateEnd,
-      town: town,
-      flatType: flatType,
-      storyRange: storyRange,
-      flatModel: flatModel,
-      minFloorArea: minFloorArea,
-      maxFloorArea: maxFloorArea,
-      minPrice: minPrice,
-      maxPrice: maxPrice,
+      resaleDateStart,
+      resaleDateEnd,
+      leaseDateStart,
+      leaseDateEnd,
+      town,
+      flatType,
+      storyRange,
+      flatModel,
+      minFloorArea,
+      maxFloorArea,
+      minPrice,
+      maxPrice,
     };
 
     const filterHistory = [...context.filters, newFilter];
@@ -147,44 +163,75 @@ const FilterScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView behavior="height" keyboardVerticalOffset={100}>
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={100}>
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.row}>
-            <Text>Select resale date start:</Text>
-            <RNDateTimePicker
-              mode="date"
-              value={resaleDateStart}
-              onChange={(e, resaleDateStart) =>
-                setResaleDateStart(resaleDateStart)
-              }
-            />
+            <Text>Resale date start:</Text>
+            <TouchableOpacity onPress={() => showDatepicker(setShowResaleDateStart)}>
+              <Text>{resaleDateStart.toDateString()}</Text>
+            </TouchableOpacity>
+            {showResaleDateStart && (
+              <DateTimePicker
+                value={resaleDateStart}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => 
+                  onDateChange(event, selectedDate, setResaleDateStart, setShowResaleDateStart)
+                }
+              />
+            )}
           </View>
+
           <View style={styles.row}>
-            <Text>Select resale date end:</Text>
-            <RNDateTimePicker
-              mode="date"
-              value={resaleDateEnd}
-              onChange={(e, resaleDateEnd) => setResaleDateEnd(resaleDateEnd)}
-            />
+            <Text>Resale date end:</Text>
+            <TouchableOpacity onPress={() => showDatepicker(setShowResaleDateEnd)}>
+              <Text>{resaleDateEnd.toDateString()}</Text>
+            </TouchableOpacity>
+            {showResaleDateEnd && (
+              <DateTimePicker
+                value={resaleDateEnd}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => 
+                  onDateChange(event, selectedDate, setResaleDateEnd, setShowResaleDateEnd)
+                }
+              />
+            )}
           </View>
+
           <View style={styles.row}>
-            <Text>Select lease date start:</Text>
-            <RNDateTimePicker
-              mode="date"
-              value={leaseDateStart}
-              onChange={(e, leaseDateStart) =>
-                setLeaseDateStart(leaseDateStart)
-              }
-            />
+            <Text>Lease date start:</Text>
+            <TouchableOpacity onPress={() => showDatepicker(setShowLeaseDateStart)}>
+              <Text>{leaseDateStart.toDateString()}</Text>
+            </TouchableOpacity>
+            {showLeaseDateStart && (
+              <DateTimePicker
+                value={leaseDateStart}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => 
+                  onDateChange(event, selectedDate, setLeaseDateStart, setShowLeaseDateStart)
+                }
+              />
+            )}
           </View>
+
           <View style={styles.row}>
-            <Text>Select lease date end:</Text>
-            <RNDateTimePicker
-              mode="date"
-              value={leaseDateEnd}
-              onChange={(e, leaseDateEnd) => setLeaseDateEnd(leaseDateEnd)}
-            />
+            <Text>Lease date end:</Text>
+            <TouchableOpacity onPress={() => showDatepicker(setShowLeaseDateEnd)}>
+              <Text>{leaseDateEnd.toDateString()}</Text>
+            </TouchableOpacity>
+            {showLeaseDateEnd && (
+              <DateTimePicker
+                value={leaseDateEnd}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => 
+                  onDateChange(event, selectedDate, setLeaseDateEnd, setShowLeaseDateEnd)
+                }
+              />
+            )}
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Town: </Text>
