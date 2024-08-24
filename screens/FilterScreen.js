@@ -9,6 +9,8 @@ import {
   View,
   Platform,
   TouchableOpacity,
+  Modal,
+  SafeAreaView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-paper";
@@ -111,10 +113,9 @@ const FilterScreen = () => {
   const [leaseDateStart, setLeaseDateStart] = useState(new Date(1965, 1, 1));
   const [leaseDateEnd, setLeaseDateEnd] = useState(new Date());
 
-  const [showResaleDateStart, setShowResaleDateStart] = useState(false);
-  const [showResaleDateEnd, setShowResaleDateEnd] = useState(false);
-  const [showLeaseDateStart, setShowLeaseDateStart] = useState(false);
-  const [showLeaseDateEnd, setShowLeaseDateEnd] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDateSetter, setCurrentDateSetter] = useState(null);
 
   const [town, setTown] = useState("All");
   const [flatType, setFlatType] = useState("All");
@@ -127,14 +128,28 @@ const FilterScreen = () => {
   const [minPrice, setMinPrice] = useState("0");
   const [maxPrice, setMaxPrice] = useState("2000000");
 
-  const onDateChange = (event, selectedDate, setDate, setShow) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === 'ios');
-    setDate(currentDate);
+  const showDatepicker = (date, dateSetter) => {
+    setCurrentDate(date);
+    setCurrentDateSetter(() => dateSetter);
+    setShowPicker(true);
   };
 
-  const showDatepicker = (setShow) => {
-    setShow(true);
+  const handleDateChange = (event, selectedDate) => {
+    const newDate = selectedDate || currentDate;
+    setCurrentDate(newDate);
+    if (Platform.OS === 'android') {
+      currentDateSetter(newDate);
+      setShowPicker(false);
+    }
+  };
+
+  const handleConfirm = () => {
+    currentDateSetter(currentDate);
+    setShowPicker(false);
+  };
+
+  const handleCancel = () => {
+    setShowPicker(false);
   };
 
   const handleSubmit = () => {
@@ -162,77 +177,77 @@ const FilterScreen = () => {
     navigation.navigate("Result");
   };
 
+  const renderDatePicker = () => {
+    if (Platform.OS === 'ios') {
+      return (
+        <Modal
+          transparent={true}
+          visible={showPicker}
+          animationType="slide"
+        >
+          <SafeAreaView style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <DateTimePicker
+                value={currentDate}
+                mode="date"
+                display="spinner"
+                onChange={handleDateChange}
+                style={styles.datePicker}
+              />
+              <View style={styles.buttonContainer}>
+                <Button title="Cancel" onPress={handleCancel} />
+                <Button title="Confirm" onPress={handleConfirm} />
+              </View>
+            </View>
+          </SafeAreaView>
+        </Modal>
+      );
+    } else {
+      return showPicker && (
+        <DateTimePicker
+          value={currentDate}
+          mode="date"
+          display="default"
+          onChange={handleDateChange}
+        />
+      );
+    }
+  };
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={100}>
       <ScrollView>
         <View style={styles.container}>
           <View style={styles.row}>
             <Text>Resale date start:</Text>
-            <TouchableOpacity onPress={() => showDatepicker(setShowResaleDateStart)}>
+            <TouchableOpacity onPress={() => showDatepicker(resaleDateStart, setResaleDateStart)}>
               <Text>{resaleDateStart.toDateString()}</Text>
             </TouchableOpacity>
-            {showResaleDateStart && (
-              <DateTimePicker
-                value={resaleDateStart}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => 
-                  onDateChange(event, selectedDate, setResaleDateStart, setShowResaleDateStart)
-                }
-              />
-            )}
           </View>
 
           <View style={styles.row}>
             <Text>Resale date end:</Text>
-            <TouchableOpacity onPress={() => showDatepicker(setShowResaleDateEnd)}>
+            <TouchableOpacity onPress={() => showDatepicker(resaleDateEnd, setResaleDateEnd)}>
               <Text>{resaleDateEnd.toDateString()}</Text>
             </TouchableOpacity>
-            {showResaleDateEnd && (
-              <DateTimePicker
-                value={resaleDateEnd}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => 
-                  onDateChange(event, selectedDate, setResaleDateEnd, setShowResaleDateEnd)
-                }
-              />
-            )}
           </View>
 
           <View style={styles.row}>
             <Text>Lease date start:</Text>
-            <TouchableOpacity onPress={() => showDatepicker(setShowLeaseDateStart)}>
+            <TouchableOpacity onPress={() => showDatepicker(leaseDateStart, setLeaseDateStart)}>
               <Text>{leaseDateStart.toDateString()}</Text>
             </TouchableOpacity>
-            {showLeaseDateStart && (
-              <DateTimePicker
-                value={leaseDateStart}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => 
-                  onDateChange(event, selectedDate, setLeaseDateStart, setShowLeaseDateStart)
-                }
-              />
-            )}
           </View>
 
           <View style={styles.row}>
             <Text>Lease date end:</Text>
-            <TouchableOpacity onPress={() => showDatepicker(setShowLeaseDateEnd)}>
+            <TouchableOpacity onPress={() => showDatepicker(leaseDateEnd, setLeaseDateEnd)}>
               <Text>{leaseDateEnd.toDateString()}</Text>
             </TouchableOpacity>
-            {showLeaseDateEnd && (
-              <DateTimePicker
-                value={leaseDateEnd}
-                mode="date"
-                display="default"
-                onChange={(event, selectedDate) => 
-                  onDateChange(event, selectedDate, setLeaseDateEnd, setShowLeaseDateEnd)
-                }
-              />
-            )}
           </View>
+
+          {renderDatePicker()}
+
           <View style={styles.row}>
             <Text style={styles.label}>Town: </Text>
             <Text> </Text>
@@ -338,5 +353,21 @@ const styles = StyleSheet.create({
   },
   label: {
     marginHorizontal: 50,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
   },
 });
