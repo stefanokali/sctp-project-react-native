@@ -41,6 +41,9 @@ export const apiHDBGet = async ({
     const storey_range = storyRange;
     const flat_model = flatModel;
 
+    console.log("minPrice", minPrice)
+    console.log("maxPrice", maxPrice)
+
     //Build filter based on API requirements
     let filter =
       "{" +

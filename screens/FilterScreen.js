@@ -260,11 +260,11 @@ const FilterScreen = () => {
           </View>
           <View style={styles.row}>
             <Text>Min price (SGD):</Text>
-            <TextInput value={minPrice} onChange={setMinPrice}></TextInput>
+            <TextInput value={minPrice} onChangeText={setMinPrice}></TextInput>
           </View>
           <View style={styles.row}>
             <Text>Max price (SGD):</Text>
-            <TextInput value={maxPrice} onChange={setMaxPrice}></TextInput>
+            <TextInput value={maxPrice} onChangeText={setMaxPrice}></TextInput>
           </View>
           <Button title="Submit" onPress={handleSubmit}></Button>
         </View>
